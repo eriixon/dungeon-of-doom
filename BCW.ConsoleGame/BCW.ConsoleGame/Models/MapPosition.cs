@@ -16,5 +16,9 @@ namespace BCW.ConsoleGame.Models
             X = x;
             Y = y;
         }
+
+        public MapPosition()
+        {
+        }
     }
 }

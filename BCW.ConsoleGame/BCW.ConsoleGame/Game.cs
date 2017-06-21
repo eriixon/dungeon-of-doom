@@ -1,40 +1,31 @@
 ﻿using BCW.ConsoleGame.Data;
 using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models;
-using BCW.ConsoleGame.Models.Commands;
 using BCW.ConsoleGame.Models.Scenes;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame
 {
     public class Game
     {
-        public IDataProvider DataProvider { get; set; }
+        private IDataProvider DataProvider { get; set; }
         public List<IScene> Scenes { get; set; }
+        public MapPosition StartPoint {get;set;}
 
         public Game(IDataProvider dataProvider)
         {
             DataProvider = dataProvider;
-
-            Scenes = new List<IScene>();
-            loadScenes();
-
-            gotoPosition(new MapPosition(9, 5));
+            Scenes = LoadScenes();
+            StartPoint = DataProvider.LoadStart();
+            GotoPosition(StartPoint);
         }
 
-        void gotoPosition(MapPosition position)
+        void GotoPosition(MapPosition position)
         {
             var scene = Scenes.FirstOrDefault(s => s.MapPosition.X == position.X && s.MapPosition.Y == position.Y);
-
-            if (scene != null)
-            {
-                scene.Enter();
-            }
+            if (scene != null) scene.Enter();
         }
 
         private void gameMenuSelected(object sender, GameEventArgs args)
@@ -47,7 +38,7 @@ namespace BCW.ConsoleGame
             }
         }
 
-        private void sceneNavigated(object sender, NavigationEventArgs args)
+        private void SceneNavigated(object sender, NavigationEventArgs args)
         {
             var toPosition = new MapPosition(args.Scene.MapPosition.X, args.Scene.MapPosition.Y);
 
@@ -71,27 +62,18 @@ namespace BCW.ConsoleGame
             }
 
             var nextScene = Scenes.FirstOrDefault(s => s.MapPosition.X == toPosition.X && s.MapPosition.Y == toPosition.Y);
-
-            if (nextScene != null)
-            {
-                nextScene.Enter();
-            }
+            if (nextScene != null) nextScene.Enter();
         }
 
-        private void loadScenes()
+        private List<IScene> LoadScenes()
         {
-            Scenes = loadData();
-
+            Scenes = DataProvider.LoadScenes();
             foreach (var scene in Scenes)
             {
                 scene.GameMenuSelected += gameMenuSelected;
-                scene.Navigated += sceneNavigated;
+                scene.Navigated += SceneNavigated;
             }
-        }
-
-        private List<IScene> loadData()
-        {
-            return DataProvider.LoadScenes();
+            return Scenes;
         }
     }
 }

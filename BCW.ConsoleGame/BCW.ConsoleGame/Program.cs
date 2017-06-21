@@ -2,12 +2,7 @@
 using Autofac.Configuration;
 using BCW.ConsoleGame.Data;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame
 {
