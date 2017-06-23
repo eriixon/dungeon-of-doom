@@ -6,8 +6,8 @@ namespace BCW.ConsoleGame.Data
 {
     public interface IDataProvider
     {
-        List<IScene> LoadScenes();
-        MapPosition LoadStart();
-        void LoadData();
+        List<IScene> Scenes { get; set; }
+        MapPosition StartPosition { get; set; }
+        void saveGameData();
     }
 }

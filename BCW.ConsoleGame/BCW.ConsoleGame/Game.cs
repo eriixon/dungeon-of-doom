@@ -17,9 +17,9 @@ namespace BCW.ConsoleGame
         public Game(IDataProvider dataProvider)
         {
             DataProvider = dataProvider;
-            Scenes = LoadScenes();
-            StartPoint = DataProvider.LoadStart();
-            GotoPosition(StartPoint);
+            Scenes = DataProvider.Scenes;
+            LoadNavigation();
+            GotoPosition(DataProvider.StartPosition);
         }
 
         void GotoPosition(MapPosition position)
@@ -33,6 +33,7 @@ namespace BCW.ConsoleGame
             switch (args.Keys.ToLower())
             {
                 case "x":
+                    DataProvider.saveGameData();
                     Environment.Exit(0);
                     break;
             }
@@ -65,15 +66,13 @@ namespace BCW.ConsoleGame
             if (nextScene != null) nextScene.Enter();
         }
 
-        private List<IScene> LoadScenes()
+        private void LoadNavigation()
         {
-            Scenes = DataProvider.LoadScenes();
             foreach (var scene in Scenes)
             {
                 scene.GameMenuSelected += gameMenuSelected;
                 scene.Navigated += SceneNavigated;
             }
-            return Scenes;
         }
     }
 }
