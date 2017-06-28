@@ -23,14 +23,8 @@ namespace BCW.ConsoleGame.Tests
                 Description = "Test of Scenes",
                 Visited = true,
                 MapPosition = new MapPosition(1,1),
-                Commands = new List<ICommand>
-                {
-                    new Command
-                    {
-                        Keys = "x",
-                        Description="Exit",
-                        Action = () => {return; }
-                    }
+                Commands = new List<ICommand> {
+                    new Command { Keys = "x", Description="Exit", Action = () => {return; }}
                 }
             };
             constructedScene = new Scene(
@@ -39,17 +33,8 @@ namespace BCW.ConsoleGame.Tests
                 new MapPosition(1, 1),
                 new List<ICommand>
                 {
-                    new NavigationCommand
-                    {
-                        Keys = "n",
-                        Description="North",
-                        Direction = Direction.North
-                    },
-                    new GameCommand
-                    {
-                        Keys = "q",
-                        Description = "Qiut"
-                    }
+                    new NavigationCommand { Keys = "n", Description="North", Direction = Direction.North },
+                    new GameCommand { Keys = "q", Description = "Qiut"}
                 });
             constructedScene.Navigated += sceneNavigated;
             constructedScene.GameMenuSelected += sceneGameMenuSelected;
@@ -95,6 +80,11 @@ namespace BCW.ConsoleGame.Tests
         public void ConstructorBindCommandEvent()
         {
             Assert.Throws<NotImplementedException>(() => { constructedScene.Commands[0].Action(); });
+        }
+        [Test]
+        public void ConstructorGameCommandEvent()
+        {
+            Assert.Throws<NotImplementedException>(() => { constructedScene.Commands[1].Action(); });
         }
     }
 }
