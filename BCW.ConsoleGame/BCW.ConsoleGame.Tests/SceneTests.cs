@@ -13,11 +13,12 @@ namespace BCW.ConsoleGame.Tests
     {
         private Scene testScene;
         private Scene constructedScene;
+        private Scene initializedScene;
 
         [SetUp]
         public void Setup()
         {
-            testScene = new Scene()
+            initializedScene = new Scene()
             {
                 Title = "Test Scene",
                 Description = "Test of Scenes",
@@ -42,12 +43,12 @@ namespace BCW.ConsoleGame.Tests
 
         private void sceneGameMenuSelected(object sender, GameEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.Keys != "q") throw new ArgumentException();
         }
 
         private void sceneNavigated(object sender, NavigationEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.Direction != Direction.North) throw new ArgumentException();
         }
 
         [Test]
@@ -65,21 +66,26 @@ namespace BCW.ConsoleGame.Tests
         [Test]
         public void ConstructorSupportObjectInit()
         {
-            Assert.IsNotNull(testScene.Title);
-            Assert.IsNotNull(testScene.Description);
-            Assert.IsTrue(testScene.Visited);
-            Assert.IsNotNull(testScene.MapPosition);
-            Assert.IsNotNull(testScene.Commands);
-            Assert.AreEqual(testScene.MapPosition.X, 1);
-            Assert.AreEqual(testScene.MapPosition.Y, 1);
-            Assert.AreEqual(testScene.Commands[0].Description, "Exit");
-            Assert.DoesNotThrow(() => { testScene.Commands[0].Action(); });
+            Assert.IsNotNull(initializedScene);
+            Assert.IsNotNull(initializedScene.Title);
+            Assert.AreEqual(initializedScene.Title, "Test Scene");
+            Assert.IsNotNull(initializedScene.Description);
+            Assert.AreEqual(initializedScene.Description, "This is a test scene");
+            Assert.IsNotNull(initializedScene.MapPosition);
+            Assert.AreEqual(initializedScene.MapPosition.X, 1);
+            Assert.AreEqual(initializedScene.MapPosition.Y, 1);
+            Assert.IsNotNull(initializedScene.Commands);
+            Assert.AreEqual(initializedScene.Commands.Count, 1);
+            Assert.AreEqual(initializedScene.Commands[0].Keys, "x");
+            Assert.AreEqual(initializedScene.Commands[0].Description, "Exit");
+            Assert.DoesNotThrow(() => { initializedScene.Commands[0].Action(); });
         }
 
         [Test]
         public void ConstructorBindCommandEvent()
         {
-            Assert.Throws<NotImplementedException>(() => { constructedScene.Commands[0].Action(); });
+            Assert.DoesNotThrow(() => { constructedScene.Commands[0].Action(); });
+            Assert.DoesNotThrow(() => { constructedScene.Commands[1].Action(); });
         }
         [Test]
         public void ConstructorGameCommandEvent()
