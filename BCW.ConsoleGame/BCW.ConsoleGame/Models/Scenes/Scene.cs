@@ -1,13 +1,15 @@
 ﻿using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models.Commands;
+using BCW.ConsoleGame.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BCW.ConsoleGame.Models.Scenes
 {
-    public class Scene : IScene
+    public class Scene : Composite, IScene
     {
+        #region IScen Implemitation
         public event EventHandler<GameEventArgs> GameMenuSelected;
         public event EventHandler<NavigationEventArgs> Navigated;
 
@@ -17,13 +19,14 @@ namespace BCW.ConsoleGame.Models.Scenes
         public MapPosition MapPosition { get; set; }
 
         public List<ICommand> Commands { get; set; }
+        public IUserInterface UserInterface { get; set; }
 
         public Scene()
         {
+            items = new List<IComposite>();
         }
 
-        public Scene(string title, string description, MapPosition position) 
-            :this(title, description, position, new List<ICommand>())
+        public Scene(string title, string description, MapPosition position) :this(title, description, position, new List<ICommand>())
         {
         }
 
@@ -50,11 +53,8 @@ namespace BCW.ConsoleGame.Models.Scenes
             while (action == null)
             {
                 display(error);
-
-                var choice = Console.ReadLine();
-
+                var choice = UserInterface.GetInput("Choose an action: ");
                 action = Commands.FirstOrDefault(c => c.Keys.ToLower() == choice.ToLower());
-
                 if (action == null) error = "Invalid Choice!";
                 else action.Action();
             }
@@ -62,27 +62,26 @@ namespace BCW.ConsoleGame.Models.Scenes
 
         protected virtual void display(string error)
         {
-            Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine(Title);
-            Console.WriteLine(new String('-', Title.Length));
-            Console.WriteLine(Description);
+            UserInterface.Clear();
+            UserInterface.Display("");
+            UserInterface.Display(Title);
+            UserInterface.Display(new String('-', Title.Length));
+            UserInterface.Display(Description);
 
-            Console.WriteLine("");
-            Console.WriteLine("Actions");
-            Console.WriteLine(new String('-', "Actions".Length));
+            UserInterface.Display("");
+            UserInterface.Display("Actions");
+            UserInterface.Display(new String('-', "Actions".Length));
 
             if (Commands != null && Commands.Count > 0)
             {
                 foreach (var command in Commands.OrderBy(c => c.Keys))
                 {
-                    Console.WriteLine("{0} = {1}", command.Keys, command.Description);
+                    UserInterface.Display($"{command.Keys} = {command.Description}");
                 }
             }
 
-            Console.WriteLine("");
+            UserInterface.Display("");
             if (error.Length > 0) Console.WriteLine(error);
-            Console.Write("Choose an action: ");
         }
 
         private void setCommandEvents()
@@ -103,5 +102,9 @@ namespace BCW.ConsoleGame.Models.Scenes
                 };
             }
         }
+
+        #endregion
+
+        
     }
 }

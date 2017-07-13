@@ -2,6 +2,7 @@
 using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models;
 using BCW.ConsoleGame.Models.Scenes;
+using BCW.ConsoleGame.User;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace BCW.ConsoleGame
         private IDataProvider DataProvider { get; set; }
         public List<IScene> Scenes { get; set; }
         public MapPosition StartPoint {get;set;}
+        public IUserInterface UserInterface { get; set; }
 
-        public Game(IDataProvider dataProvider)
+        public Game(IDataProvider dataProvider, IUserInterface userInterface)
         {
             DataProvider = dataProvider;
             Scenes = DataProvider.Scenes;
+            UserInterface = userInterface;
             LoadNavigation();
             GotoPosition(DataProvider.StartPosition);
         }
@@ -70,6 +73,7 @@ namespace BCW.ConsoleGame
         {
             foreach (var scene in Scenes)
             {
+                scene.UserInterface = UserInterface;
                 scene.GameMenuSelected += gameMenuSelected;
                 scene.Navigated += SceneNavigated;
             }
