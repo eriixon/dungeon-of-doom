@@ -3,7 +3,12 @@ using Autofac.Configuration;
 using BCW.ConsoleGame.Data;
 using BCW.ConsoleGame.User;
 using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame
 {
@@ -22,7 +27,7 @@ namespace BCW.ConsoleGame
             builder.RegisterModule(module);
 
             var container = builder.Build();
-            
+
             var game = new Game(container.Resolve<IDataProvider>(), container.Resolve<IUserInterface>());
         }
     }

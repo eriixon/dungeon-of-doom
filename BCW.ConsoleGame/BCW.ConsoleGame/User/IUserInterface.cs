@@ -8,8 +8,8 @@ namespace BCW.ConsoleGame.User
 {
     public interface IUserInterface
     {
-        void Clear();
         void Display(string text);
         string GetInput(string prompt);
+        void Clear();
     }
 }

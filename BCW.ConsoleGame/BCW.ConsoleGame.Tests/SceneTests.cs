@@ -1,10 +1,13 @@
 ﻿using NUnit.Framework;
 using BCW.ConsoleGame.Models.Scenes;
-using BCW.ConsoleGame.Models;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BCW.ConsoleGame.Models;
 using BCW.ConsoleGame.Models.Commands;
 using BCW.ConsoleGame.Events;
-using System;
 using BCW.ConsoleGame.User;
 using Moq;
 
@@ -14,46 +17,54 @@ namespace BCW.ConsoleGame.Tests
     public class SceneTests
     {
         private Mock<IUserInterface> mockUserInterface;
-
-        private Scene constructedScene;
         private Scene initializedScene;
+        private Scene constructedScene;
 
         [SetUp]
         public void Setup()
         {
             mockUserInterface = new Mock<IUserInterface>();
-            initializedScene = new Scene()
+
+            initializedScene = new Scene
             {
                 Title = "Test Scene",
-                Description = "Test of scenes",
-                Visited = true,
-                MapPosition = new MapPosition(1,1),
-                Commands = new List<ICommand> {
-                    new Command { Keys = "x", Description="Exit", Action = () => {return; }}
+                Description = "This is a test scene",
+                MapPosition = new MapPosition(1, 1),
+                Commands = new List<ICommand>
+                {
+                    new Command
+                    {
+                        Keys = "x",
+                        Description = "Exit",
+                        Action = () => { return; }
+                    }
                 }
             };
+
             constructedScene = new Scene(
                 "Test Scene",
-                "Test of scenes",
+                "This is a test scene",
+                1,
                 new MapPosition(1, 1),
                 new List<ICommand>
                 {
-                    new NavigationCommand { Keys = "n", Description="North", Direction = Direction.North },
-                    new GameCommand { Keys = "x", Description = "Qiut"}
-                });
+                    new NavigationCommand
+                    {
+                        Keys = "n",
+                        Description = "Go North",
+                        Direction = Direction.North
+                    },
+                    new GameCommand
+                    {
+                        Keys = "x",
+                        Description = "Quit"
+                    }
+                }
+            );
+
             constructedScene.UserInterface = mockUserInterface.Object;
             constructedScene.Navigated += sceneNavigated;
             constructedScene.GameMenuSelected += sceneGameMenuSelected;
-        }
-
-        private void sceneGameMenuSelected(object sender, GameEventArgs e)
-        {
-            if (e.Keys != "x") throw new ArgumentException();
-        }
-
-        private void sceneNavigated(object sender, NavigationEventArgs e)
-        {
-            if (e.Direction != Direction.North) throw new ArgumentException();
         }
 
         [Test]
@@ -69,13 +80,13 @@ namespace BCW.ConsoleGame.Tests
         }
 
         [Test]
-        public void ConstructorSupportObjectInit()
+        public void DefaultConstructorSupportsObjectInitialization()
         {
             Assert.IsNotNull(initializedScene);
             Assert.IsNotNull(initializedScene.Title);
             Assert.AreEqual(initializedScene.Title, "Test Scene");
             Assert.IsNotNull(initializedScene.Description);
-            Assert.AreEqual(initializedScene.Description, "Test of scenes");
+            Assert.AreEqual(initializedScene.Description, "This is a test scene");
             Assert.IsNotNull(initializedScene.MapPosition);
             Assert.AreEqual(initializedScene.MapPosition.X, 1);
             Assert.AreEqual(initializedScene.MapPosition.Y, 1);
@@ -87,34 +98,49 @@ namespace BCW.ConsoleGame.Tests
         }
 
         [Test]
-        public void ConstructorBindCommandEvent()
+        public void ConstructorsBindCommandEvents()
         {
             Assert.DoesNotThrow(() => { constructedScene.Commands[0].Action(); });
             Assert.DoesNotThrow(() => { constructedScene.Commands[1].Action(); });
         }
+
         [Test]
-        public void ConstructorGameCommandEvent()
-        {
-            Assert.DoesNotThrow(() => { constructedScene.Commands[1].Action(); });
-        }
-        [Test]
-        public void EnterDisplayDetails()
+        public void EnterDisplaysDetails()
         {
             mockUserInterface.Setup(ui => ui.GetInput("Choose an action: ")).Returns("x");
 
             constructedScene.Enter();
+
             mockUserInterface.Verify(ui => ui.Clear());
             mockUserInterface.Verify(ui => ui.Display("Test Scene"));
-            mockUserInterface.Verify(ui => ui.Display("Test of scenes"));
+            mockUserInterface.Verify(ui => ui.Display("This is a test scene"));
         }
 
         [Test]
-        public void EnterDisplayCommandChoises()
+        public void EnterDisplaysCommandChoices()
         {
             mockUserInterface.Setup(ui => ui.GetInput("Choose an action: ")).Returns("x");
+
             constructedScene.Enter();
-            mockUserInterface.Setup(ui => ui.Display("n = Go North"));
-            mockUserInterface.Setup(ui => ui.Display("x = Quit"));
+
+            mockUserInterface.Verify(ui => ui.Display("n = Go North"));
+            mockUserInterface.Verify(ui => ui.Display("x = Quit"));
+        }
+
+        private void sceneNavigated(object sender, NavigationEventArgs e)
+        {
+            if (e.Direction != Direction.North)
+            {
+                throw new ArgumentException();
+            }
+        }
+
+        private void sceneGameMenuSelected(object sender, GameEventArgs e)
+        {
+            if (e.Keys != "x")
+            {
+                throw new ArgumentException();
+            }
         }
     }
 }

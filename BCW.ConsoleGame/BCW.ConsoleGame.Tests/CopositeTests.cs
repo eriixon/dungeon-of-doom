@@ -12,14 +12,28 @@ namespace BCW.ConsoleGame.Tests
     [TestFixture]
     class CopositeTests
     {
-        [Test]
+        private CompositeTest actual;
+        [SetUp]
         public void CompositeTest()
         {
-            var actual = new CompositeTest();
-            
-            var expected = new List<IComposite>();
+            actual = new CompositeTest() { Name = "Inventory" };
+            actual.AddItem("treasure/gems/rubies", new CompositeTest() { Name = "Ruby" });
+            actual.AddItem("treasure/coins", new CompositeTest() { Name = "Doubloon" });
+        }
 
-            Assert.That(actual.GetItems(), Is.Not.Null);
+        [Test]
+        public void CountOnlyIncludedLeafNodes()
+        {
+            //var expected = new List<IComposite>();
+            Assert.That(actual.Count, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void PruneTest()
+        {
+            var ruby = new CompositeTest() { Name = "Ruby" };
+            actual.RemoveItem("treasure / gems / rubies", ruby);
+            Assert.That(actual.Count, Is.EqualTo(1));
         }
     }
     class CompositeTest: Composite

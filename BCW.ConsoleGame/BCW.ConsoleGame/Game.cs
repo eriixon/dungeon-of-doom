@@ -11,24 +11,29 @@ namespace BCW.ConsoleGame
 {
     public class Game
     {
-        private IDataProvider DataProvider { get; set; }
-        public List<IScene> Scenes { get; set; }
-        public MapPosition StartPoint {get;set;}
+        public IDataProvider DataProvider { get; set; }
         public IUserInterface UserInterface { get; set; }
+        public List<IScene> Scenes { get; set; }
 
         public Game(IDataProvider dataProvider, IUserInterface userInterface)
         {
             DataProvider = dataProvider;
-            Scenes = DataProvider.Scenes;
             UserInterface = userInterface;
-            LoadNavigation();
-            GotoPosition(DataProvider.StartPosition);
+
+            Scenes = DataProvider.Scenes;
+            subscribeToEvents();
+
+            gotoPosition(DataProvider.StartPosition);
         }
 
-        void GotoPosition(MapPosition position)
+        void gotoPosition(MapPosition position)
         {
             var scene = Scenes.FirstOrDefault(s => s.MapPosition.X == position.X && s.MapPosition.Y == position.Y);
-            if (scene != null) scene.Enter();
+
+            if (scene != null)
+            {
+                scene.Enter();
+            }
         }
 
         private void gameMenuSelected(object sender, GameEventArgs args)
@@ -36,13 +41,13 @@ namespace BCW.ConsoleGame
             switch (args.Keys.ToLower())
             {
                 case "x":
-                    DataProvider.saveGameData();
+                    DataProvider.SaveGameState();
                     Environment.Exit(0);
                     break;
             }
         }
 
-        private void SceneNavigated(object sender, NavigationEventArgs args)
+        private void sceneNavigated(object sender, NavigationEventArgs args)
         {
             var toPosition = new MapPosition(args.Scene.MapPosition.X, args.Scene.MapPosition.Y);
 
@@ -66,17 +71,29 @@ namespace BCW.ConsoleGame
             }
 
             var nextScene = Scenes.FirstOrDefault(s => s.MapPosition.X == toPosition.X && s.MapPosition.Y == toPosition.Y);
-            if (nextScene != null) nextScene.Enter();
+
+            if (nextScene != null)
+            {
+                DataProvider.StartPosition = nextScene.MapPosition;
+                nextScene.Enter();
+            }
         }
 
-        private void LoadNavigation()
+        private void playerAttacked (object sender, AttackEventArgs args)
+        {
+            args.Scene.Feedback = "You attacked the Monsters";
+        }
+
+        private void subscribeToEvents()
         {
             foreach (var scene in Scenes)
             {
                 scene.UserInterface = UserInterface;
                 scene.GameMenuSelected += gameMenuSelected;
-                scene.Navigated += SceneNavigated;
+                scene.Navigated += sceneNavigated;
+                scene.Attacked += playerAttacked;
             }
         }
+
     }
 }

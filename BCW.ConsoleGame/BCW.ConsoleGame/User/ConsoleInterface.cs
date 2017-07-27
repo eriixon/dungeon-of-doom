@@ -20,7 +20,8 @@ namespace BCW.ConsoleGame.User
 
         public string GetInput(string prompt)
         {
-            Console.WriteLine(prompt);
+            Console.Write(prompt);
+
             return Console.ReadLine();
         }
     }
