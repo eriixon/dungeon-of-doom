@@ -22,7 +22,9 @@ namespace BCW.ConsoleGame.Models.Scenes
         MapPosition MapPosition { get; set; }
         int Difficulty { get; set; }
         string Feedback { get; set; }
+
         List<ICommand> Commands { get; set; }
+
         void Enter();
     }
 }

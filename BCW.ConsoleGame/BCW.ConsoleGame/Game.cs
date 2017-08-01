@@ -1,11 +1,15 @@
 ﻿using BCW.ConsoleGame.Data;
 using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models;
+using BCW.ConsoleGame.Models.Commands;
 using BCW.ConsoleGame.Models.Scenes;
 using BCW.ConsoleGame.User;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame
 {
@@ -21,6 +25,7 @@ namespace BCW.ConsoleGame
             UserInterface = userInterface;
 
             Scenes = DataProvider.Scenes;
+
             subscribeToEvents();
 
             gotoPosition(DataProvider.StartPosition);
@@ -79,9 +84,9 @@ namespace BCW.ConsoleGame
             }
         }
 
-        private void playerAttacked (object sender, AttackEventArgs args)
+        private void playerAttacked(object sender, AttackEventArgs args)
         {
-            args.Scene.Feedback = "You attacked the Monsters";
+            args.Scene.Feedback = "You attacked the monsters!";
         }
 
         private void subscribeToEvents()

@@ -21,12 +21,13 @@ namespace BCW.ConsoleGame.JsonData
 
         public MapPosition StartPosition { get; set; }
         public List<IScene> Scenes { get; set; }
-        public List<IMonsterType> MonsterType { get ; set ; }
+        public List<IMonsterType> MonsterTypes { get; set; }
 
         public Provider()
         {
-            MonsterType = loadMonsterTyper();
-            MonsterFactory.Instance(MonsterType);
+            MonsterTypes = loadMonsterTypes();
+
+            MonsterFactory.Instance(MonsterTypes);
 
             Scenes = loadScenes();
             StartPosition = loadStartPosition();
@@ -36,17 +37,18 @@ namespace BCW.ConsoleGame.JsonData
         {
             saveGameData();
         }
-        private List<IMonsterType> loadMonsterTyper()
+
+        private List<IMonsterType> loadMonsterTypes()
         {
-            var monsterType = new List<IMonsterType>();
-            var dataFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "MonsterType.json");
+            var monsterTypes = new List<IMonsterType>();
+            var dataFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "MonsterTypes.json");
 
             using (StreamReader reader = File.OpenText(dataFilePath))
             {
                 var monsterData = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
                 var monsterJson = (JArray)monsterData.GetValue("Types");
 
-                monsterType = monsterJson.Select(t => new MonsterType
+                monsterTypes = monsterJson.Select(t => new MonsterType
                 (
                     (string)t["Name"],
                     (int)t["Health"]["Min"],
@@ -55,15 +57,16 @@ namespace BCW.ConsoleGame.JsonData
                     (int)t["Damage"]["Max"],
                     (t["Odds"] as JArray).Select(o => new Odds
                         (
-                        (int)o["Level"],
-                        (int)o["Exist"],
-                        (int)o["Count"]["Min"],
-                        (int)o["Count"]["Max"]
+                            (int)o["Level"],
+                            (int)o["Exist"],
+                            (int)o["Count"]["Min"],
+                            (int)o["Count"]["Max"]
                         )
-                       ).ToDictionary(o => o.Level)
-                    )).ToList<IMonsterType>();
+                    ).ToDictionary(o => o.Level)
+                )).ToList<IMonsterType>();
             }
-            return monsterType;
+
+            return monsterTypes;
         }
 
         private List<IScene> loadScenes()

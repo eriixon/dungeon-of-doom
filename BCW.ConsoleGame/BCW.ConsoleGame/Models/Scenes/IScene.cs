@@ -9,16 +9,19 @@ using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame.Models.Scenes
 {
-    public interface IScene
+    public interface IScene : IComposite
     {
         event EventHandler<GameEventArgs> GameMenuSelected;
         event EventHandler<NavigationEventArgs> Navigated;
+        event EventHandler<AttackEventArgs> Attacked;
 
         IUserInterface UserInterface { get; set; }
         string Title { get; set; }
         string Description { get; set; }
         bool Visited { get; set; }
         MapPosition MapPosition { get; set; }
+        int Difficulty { get; set; }
+        string Feedback { get; set; }
 
         List<ICommand> Commands { get; set; }
 

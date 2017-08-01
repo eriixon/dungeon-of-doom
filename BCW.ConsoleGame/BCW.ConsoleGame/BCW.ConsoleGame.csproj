@@ -96,30 +96,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\IDataProvider.cs" />
-    <Compile Include="Events\Models\Characters\IMonsterType.cs" />
     <Compile Include="Events\AttackEventArgs.cs" />
     <Compile Include="Events\GameEventArgs.cs" />
     <Compile Include="Events\NavigationEventArgs.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Events\Models\Characters\IMonster.cs" />
-    <Compile Include="Events\Models\Characters\IMonsterFactory.cs" />
-    <Compile Include="Events\Models\Characters\Monster.cs" />
-    <Compile Include="Events\Models\Characters\MonsterFactory.cs" />
-    <Compile Include="Events\Models\Characters\MonsterType.cs" />
-    <Compile Include="Events\Models\Characters\Odds.cs" />
-    <Compile Include="Events\Models\Commands\AttackCommand.cs" />
-    <Compile Include="Events\Models\Commands\GameCommand.cs" />
-    <Compile Include="Events\Models\Commands\IAttackCommand.cs" />
-    <Compile Include="Events\Models\Commands\IGameCommand.cs" />
-    <Compile Include="Events\Models\Composite.cs" />
-    <Compile Include="Events\Models\IComposite.cs" />
-    <Compile Include="Events\Models\MapPosition.cs" />
-    <Compile Include="Events\Models\Commands\Command.cs" />
-    <Compile Include="Events\Models\Commands\ICommand.cs" />
-    <Compile Include="Events\Models\Commands\INavigationCommand.cs" />
-    <Compile Include="Events\Models\Scenes\IScene.cs" />
-    <Compile Include="Events\Models\Commands\NavigationCommand.cs" />
-    <Compile Include="Events\Models\Scenes\Scene.cs" />
+    <Compile Include="Models\Characters\IMonster.cs" />
+    <Compile Include="Models\Characters\IMonsterFactory.cs" />
+    <Compile Include="Models\Characters\IMonsterType.cs" />
+    <Compile Include="Models\Characters\Monster.cs" />
+    <Compile Include="Models\Characters\MonsterFactory.cs" />
+    <Compile Include="Models\Characters\MonsterType.cs" />
+    <Compile Include="Models\Characters\Odds.cs" />
+    <Compile Include="Models\Commands\AttackCommand.cs" />
+    <Compile Include="Models\Commands\GameCommand.cs" />
+    <Compile Include="Models\Commands\IAttackCommand.cs" />
+    <Compile Include="Models\Commands\IGameCommand.cs" />
+    <Compile Include="Models\Composite.cs" />
+    <Compile Include="Models\IComposite.cs" />
+    <Compile Include="Models\MapPosition.cs" />
+    <Compile Include="Models\Commands\Command.cs" />
+    <Compile Include="Models\Commands\ICommand.cs" />
+    <Compile Include="Models\Commands\INavigationCommand.cs" />
+    <Compile Include="Models\Scenes\IScene.cs" />
+    <Compile Include="Models\Commands\NavigationCommand.cs" />
+    <Compile Include="Models\Scenes\Scene.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User\ConsoleInterface.cs" />
@@ -130,7 +130,7 @@
     <None Include="autofac.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\MonsterType.json">
+    <None Include="Data\MonsterTypes.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\Scenes.json">
