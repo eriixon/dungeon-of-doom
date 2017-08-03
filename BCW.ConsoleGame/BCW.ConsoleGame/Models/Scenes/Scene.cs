@@ -1,6 +1,7 @@
 ﻿using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models.Characters;
 using BCW.ConsoleGame.Models.Commands;
+using BCW.ConsoleGame.Models.Treasures;
 using BCW.ConsoleGame.User;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace BCW.ConsoleGame.Models.Scenes
 {
     public class Scene : Composite, IScene
     {
+        private IPlayer player;
         public Scene()
         {
             items = new List<IComposite>();
@@ -25,7 +27,6 @@ namespace BCW.ConsoleGame.Models.Scenes
         public Scene(string title, string description, int difficulty, MapPosition position, params List<ICommand>[] commands)
         {
             items = new List<IComposite>();
-
             Title = title;
             Description = description;
             Difficulty = difficulty;
@@ -42,7 +43,6 @@ namespace BCW.ConsoleGame.Models.Scenes
             if(monsters.Count > 0)
             {
                 Commands.Add(new AttackCommand { Keys = "A", Description = "Attack The Monsters" });
-
                 foreach (var monster in monsters)
                 {
                     AddItem("Monsters", monster);
@@ -68,18 +68,16 @@ namespace BCW.ConsoleGame.Models.Scenes
 
         public List<ICommand> Commands { get; set; }
 
-        public virtual void Enter()
+        public virtual void Enter(IPlayer player)
         {
+            this.player = player;
             ICommand action = null;
 
             while (true)
             {
                 display();
-
                 var choice = UserInterface.GetInput("Choose an action: ");
-
                 action = Commands.FirstOrDefault(c => c.Keys.ToLower() == choice.ToLower());
-
                 if (action == null) Feedback = "Invalid Choice!";
                 else action.Action();
             }
@@ -94,7 +92,6 @@ namespace BCW.ConsoleGame.Models.Scenes
             UserInterface.Display(Description);
 
             var monsters = GetItems("Monsters");
-
             if(monsters.Count > 0)
             {
                 var zombieCount = monsters.Count(m => m.Name == "Zombie");
@@ -114,15 +111,62 @@ namespace BCW.ConsoleGame.Models.Scenes
                 monsterText += dragonText.Length > 0 ? monsterText.Length > 0 ? $" and {dragonText}" : dragonText : "";
 
                 var isAre = monsters.Count > 1 ? "are" : "is";
-
                 UserInterface.Display($"There {isAre} {monsterText} in the room.");
+            } else
+            {
+                Commands = Commands.Where(c => !(c is IAttackCommand)).ToList();
             }
 
-            if(!String.IsNullOrEmpty(Feedback))
+            var treasures = GetItems("Treasures");
+            var pickUpCommand = Commands.FirstOrDefault(c => c.Keys.ToLower() == "p");
+
+            if(treasures.Count > 0 && monsters.Count == 0)
+            {
+                var treasureText = "";
+                foreach (var item in treasures)
+                {
+                    var treasure = (ITreasure)item;
+                    treasureText += $"{treasure.Name} ({treasure.Value})\n";
+                }
+                UserInterface.Display($"The room contains the following treasure:\n{treasureText}");
+                if(pickUpCommand == null)
+                {
+                    pickUpCommand = new AttackCommand { Keys = "P", Description = "Pickup Treasure" };
+                    pickUpCommand.Action = () =>
+                    {
+                        GameMenuSelected?.Invoke(this, new GameEventArgs(this, pickUpCommand.Keys));
+                    };
+                    Commands.Add(pickUpCommand);
+                }
+            }
+            else
+            {
+                if(pickUpCommand != null)
+                {
+                    Commands = Commands.Where(c => c.Keys.ToLower() != "p").ToList();
+                }
+            }
+
+            if (!String.IsNullOrEmpty(Feedback))
             {
                 UserInterface.Display("");
                 UserInterface.Display(Feedback);
                 Feedback = "";
+            }
+
+            UserInterface.Display("");
+            UserInterface.Display($"Your health: {player.Health}");
+
+            var playerTreasure = player.GetItems("Treasures");
+            var playerTreasureText = "";
+            if(playerTreasure.Count > 0)
+            {
+                foreach (var item in playerTreasure)
+                {
+                    var treasure = (ITreasure)item;
+                    playerTreasureText += $"{treasure.Name}({treasure.Value})\n";
+                }
+                UserInterface.Display($"Your Treasures:\n\n{playerTreasureText}");
             }
 
             UserInterface.Display("");

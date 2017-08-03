@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 
 namespace BCW.ConsoleGame.Models.Characters
 {
-    public interface IMonster : IComposite
+    public interface IPlayer: IComposite
     {
         int Health { get; set; }
         int Damage { get; set; }
         int Defense { get; set; }
         int Vitality { get; set; }
         int Agility { get; set; }
-
-        int Defend();
-        int Attack();
     }
 }

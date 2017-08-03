@@ -1,6 +1,7 @@
 ﻿using BCW.ConsoleGame.Data;
 using BCW.ConsoleGame.Events;
 using BCW.ConsoleGame.Models;
+using BCW.ConsoleGame.Models.Characters;
 using BCW.ConsoleGame.Models.Commands;
 using BCW.ConsoleGame.Models.Scenes;
 using BCW.ConsoleGame.User;
@@ -15,6 +16,7 @@ namespace BCW.ConsoleGame
 {
     public class Game
     {
+        private IPlayer player;
         public IDataProvider DataProvider { get; set; }
         public IUserInterface UserInterface { get; set; }
         public List<IScene> Scenes { get; set; }
@@ -23,11 +25,12 @@ namespace BCW.ConsoleGame
         {
             DataProvider = dataProvider;
             UserInterface = userInterface;
-
             Scenes = DataProvider.Scenes;
-
+            player = new Player()
+            {
+                Health = 20
+            };
             subscribeToEvents();
-
             gotoPosition(DataProvider.StartPosition);
         }
 
@@ -37,7 +40,7 @@ namespace BCW.ConsoleGame
 
             if (scene != null)
             {
-                scene.Enter();
+                scene.Enter(player);
             }
         }
 
@@ -45,6 +48,9 @@ namespace BCW.ConsoleGame
         {
             switch (args.Keys.ToLower())
             {
+                case "p":
+                    pickedUpTreasure(args.Scene);
+                    break;
                 case "x":
                     DataProvider.SaveGameState();
                     Environment.Exit(0);
@@ -80,13 +86,92 @@ namespace BCW.ConsoleGame
             if (nextScene != null)
             {
                 DataProvider.StartPosition = nextScene.MapPosition;
-                nextScene.Enter();
+                nextScene.Enter(player);
             }
         }
 
         private void playerAttacked(object sender, AttackEventArgs args)
         {
-            args.Scene.Feedback = "You attacked the monsters!";
+            attackMonsters(args.Scene);
+            attackPlayer(args.Scene);
+        }
+
+        private void attackMonsters(IScene scene)
+        {
+            var didHitMonster = false;
+            var monsters = scene.GetItems("Monsters");
+
+            foreach (var item in monsters)
+            {
+                var monster = (IMonster)item;
+
+                var damage = monster.Defend();
+
+                if (damage > 0)
+                {
+                    didHitMonster = true;
+
+                    if (monster.Health == 0)
+                    {
+                        scene.Feedback = $"You killed a {monster.Name}!";
+                        var treasures = monster.GetItems("Treasures");
+
+                        if (treasures.Count > 0)
+                        {
+                            scene.Feedback = $"{monster.Name} dropped some treasure. ";
+                        }
+                        foreach (var treasure in treasures)
+                        {
+                            scene.AddItem("Treasures", treasure);
+                        }
+
+                        // remove dead monsters from the scene
+                        scene.RemoveItem("Monsters", item);
+
+                        if (scene.GetItems("Monsters").Count == 0)
+                        {
+                            scene.Feedback += " There are no monsters left.";
+                        }
+                    }
+                    else
+                    {
+                        scene.Feedback = $"You hit a {monster.Name} and inflicted {damage} points of damage.";
+                    }
+
+                    break;
+                }
+            }
+
+            if (!didHitMonster)
+            {
+                scene.Feedback = $"You missed!";
+            }
+        }
+
+        private void attackPlayer(IScene scene)
+        {
+            var monsters = scene.GetItems("Monsters");
+
+            foreach (var item in monsters)
+            {
+                var monster = (IMonster)item;
+
+                var damage = monster.Attack();
+
+                if (damage > 0)
+                {
+                    player.Health -= damage;
+                    scene.Feedback += $" You were hit by a {monster.Name} and took {damage} points of damage!";
+
+                    if (player.Health <= 0)
+                    {
+                        player.Health = 0;
+                        scene.Commands = scene.Commands.Where(c => c is IGameCommand && c.Keys.ToLower() == "x").ToList();
+                        scene.Feedback += " You died.";
+                    }
+                    break;
+                }
+            }
         }
 
         private void subscribeToEvents()
@@ -98,6 +183,16 @@ namespace BCW.ConsoleGame
                 scene.Navigated += sceneNavigated;
                 scene.Attacked += playerAttacked;
             }
+        }
+
+        private void pickedUpTreasure(IScene scene)
+        {
+            var treasures = scene.GetItems("Treasures");
+            foreach (var treasure in treasures)
+            {
+                player.AddItem("Treasures", treasure);
+            }
+            scene.RemoveItems("Treasures");
         }
 
     }

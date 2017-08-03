@@ -13,6 +13,16 @@ namespace BCW.ConsoleGame.Models.Characters
         int HealthMax { get; set; }
         int DamageMin { get; set; }
         int DamageMax { get; set; }
+
+        int AgilityMin { get; set; }
+        int AgilityMax { get; set; }
+
+        int DefenseMin { get; set; }
+        int DefenseMax { get; set; }
+
+        int VitalityMin { get; set; }
+        int VitalityMax { get; set; }
+
         IDictionary<int, Odds> LevelOdds { get; set; }
     }
 }

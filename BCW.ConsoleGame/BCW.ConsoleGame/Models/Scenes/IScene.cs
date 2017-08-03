@@ -1,4 +1,5 @@
 ﻿using BCW.ConsoleGame.Events;
+using BCW.ConsoleGame.Models.Characters;
 using BCW.ConsoleGame.Models.Commands;
 using BCW.ConsoleGame.User;
 using System;
@@ -22,9 +23,8 @@ namespace BCW.ConsoleGame.Models.Scenes
         MapPosition MapPosition { get; set; }
         int Difficulty { get; set; }
         string Feedback { get; set; }
-
         List<ICommand> Commands { get; set; }
 
-        void Enter();
+        void Enter(IPlayer player);
     }
 }

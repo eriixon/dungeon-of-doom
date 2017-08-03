@@ -53,8 +53,14 @@ namespace BCW.ConsoleGame.JsonData
                     (string)t["Name"],
                     (int)t["Health"]["Min"],
                     (int)t["Health"]["Max"],
+                    (int)t["Agility"]["Min"],
+                    (int)t["Agility"]["Max"],
                     (int)t["Damage"]["Min"],
                     (int)t["Damage"]["Max"],
+                    (int)t["Defense"]["Min"],
+                    (int)t["Defense"]["Max"],
+                    (int)t["Vitality"]["Min"],
+                    (int)t["Vitality"]["Max"],
                     (t["Odds"] as JArray).Select(o => new Odds
                         (
                             (int)o["Level"],
@@ -118,11 +124,7 @@ namespace BCW.ConsoleGame.JsonData
                          {
                              Title = s.Title,
                              Description = s.Description,
-                             MapPosition = new
-                             {
-                                 X = s.MapPosition.X,
-                                 Y = s.MapPosition.Y
-                             },
+                             MapPosition = new { X = s.MapPosition.X, Y = s.MapPosition.Y },
                              NavigationCommands = from c in s.Commands.Where(c => c is INavigationCommand)
                                                   select new
                                                   {
@@ -134,11 +136,8 @@ namespace BCW.ConsoleGame.JsonData
             });
 
             var fileData = Encoding.ASCII.GetBytes(gameData.ToString());
-
             var dataFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Scenes.json");
-
-            using (FileStream writer = File.Open(dataFilePath, FileMode.Truncate))
-            {
+            using (FileStream writer = File.Open(dataFilePath, FileMode.Truncate))            {
                 writer.Write(fileData, 0, fileData.Length);
             }
         }
